@@ -1,0 +1,14 @@
+/* .menu {
+    transition: max-height 0.3s ease-in-out;
+    overflow: hidden;
+}
+
+.hidden {
+    max-height: 0;
+    opacity: 0;
+}
+
+.visible {
+    max-height: 500px;
+    opacity: 1;
+} */
