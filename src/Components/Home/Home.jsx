@@ -47,11 +47,11 @@ export default function Home() {
   }
 
   return <>
-  <div className='overflow-hidden'>
-    
-  <MainSlider/>
-    <CategoriesSlider />
-  </div>
+    <div className='overflow-hidden'>
+
+      <MainSlider />
+      <CategoriesSlider />
+    </div>
 
     <div className='p-6'>
       <div className="w-3/4 mx-auto my-4">
