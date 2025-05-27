@@ -1,19 +1,18 @@
-import React, { useState } from 'react'
+import React from 'react'
 import style from './Layout.module.css'
 import Navbar from '../Navbar/Navbar.jsx'
 import Footer from '../Footer/Footer.jsx'
 import { Outlet } from 'react-router-dom'
+import ThemeToggle from '../ThemeToggle/ThemeToggle'
 
 export default function Layout() {
-
-
-
-
-  return <>
-    <Navbar />
-    <div className=" md:pt-12">
-      <Outlet></Outlet>
+  return (
+    <div className="min-h-screen bg-white dark:bg-dark-primary text-gray-900 dark:text-dark-text transition-colors duration-200">
+      <Navbar />
+      <div className="md:pt-12">
+        <Outlet />
+      </div>
+      <Footer />
     </div>
-    <Footer />
-  </>
+  )
 }
