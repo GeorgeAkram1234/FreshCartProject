@@ -9,7 +9,6 @@ import { AuthContext } from '../../Contexts/AuthContext'
 
 
 export default function Login() {
-
   const [loading, setLoading] = useState(false)
   const [successMsg, setSuccessMsg] = useState(null)
   const [errorMsg, setErrorMsg] = useState(null)
@@ -17,7 +16,6 @@ export default function Login() {
   const { setUserToken } = useContext(AuthContext)
 
   const validationSchema = Yup.object({
-
     email: Yup.string().email('email invalid').required('email is required'),
     password: Yup.string().matches(/^(?=.*\d)(?=.*[a-zA-Z]).{3,10}$/, 'password is invalid').required('password is required'),
   })
@@ -33,71 +31,119 @@ export default function Login() {
     validationSchema
   })
 
-
   async function onSubmit() {
     setSuccessMsg('')
     setErrorMsg('')
     setLoading(true)
     await axios.post("https://ecommerce.routemisr.com/api/v1/auth/signin", values).then((response) => {
       setLoading(false)
-      // setSuccessMsg(response.data.message)
       setUserToken(response.data.token)
       localStorage.setItem('token', response.data.token)
-      console.log(response.data.token)
       if (location.pathname == '/login') {
         navigate('/')
       } else {
         navigate(location.pathname)
       }
-
     }).catch((err) => {
       setLoading(false)
-      console.log(err.response.data.message)
       setErrorMsg(err.response.data.message)
     })
-
   }
 
-  return <>
-
-    <div className="py-20">
-
-      <h1 className="text-3xl text-center">Login</h1>
-
-
-      <form className="w-1/2 mx-auto capitalize" onSubmit={handleSubmit}>
-
-        <div className="relative z-0 w-full mb-5 group">
-          <input onBlur={handleBlur} onChange={handleChange} value={values.email} type="email" name="email" id="email" className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-emerald-500 focus:outline-none focus:ring-0 focus:border-emerald-600 peer" placeholder=" " />
-          <label htmlFor="email" className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-emerald-600 peer-focus:dark:text-emerald-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">Enter Your mail</label>
-          {touched.email && errors.email && <p className='text-red-600'>{errors.email}</p>}
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-dark-primary py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8 bg-white dark:bg-dark-secondary p-8 rounded-xl shadow-lg transform transition-all duration-300 hover:scale-[1.02]">
+        <div>
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
+            Welcome Back
+          </h2>
+          <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
+            Sign in to your account
+          </p>
         </div>
-        <div className="relative z-0 w-full mb-5 group">
-          <input onBlur={handleBlur} onChange={handleChange} value={values.password} type="password" name="password" id="password" className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-emerald-500 focus:outline-none focus:ring-0 focus:border-emerald-600 peer" placeholder=" " />
-          <label htmlFor="password" className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:start-0 rtl:peer-focus:translate-x-1/4 peer-focus:text-emerald-600 peer-focus:dark:text-emerald-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6 ">enter your password</label>
-          {touched.password && errors.password && <p className='text-red-600'>{errors.password}</p>}
-        </div>
-        <button type="submit" className="text-white bg-emerald-700 hover:bg-emerald-800 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-emerald-600 dark:hover:bg-emerald-700 dark:focus:ring-emerald-800 disabled:bg-gray-500" disabled={loading}>Submit {loading && <i className='fas fa-spin fa-spinner'></i>}</button>
-        <div className='text-center'>
-          {errorMsg && <p className='text-red-500  font-bold text-lg'>{errorMsg}</p>}
-          {successMsg && <p className='text-green-500 font-bold text-lg'>{successMsg}</p>}
 
-          <div className="flex justify-between my-3">
-            <div>
-              <Link to={'/forgetPass'}className='font-semibold hover:text-green-500 transition-all duration-200 cursor-pointer'>forgot your password?
-
-              </Link>
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+          <div className="rounded-md shadow-sm space-y-4">
+            <div className="relative group">
+              <input
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.email}
+                type="email"
+                name="email"
+                id="email"
+                className="appearance-none rounded-lg relative block w-full px-3 py-3 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white dark:bg-dark-primary focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200"
+                placeholder="Email address"
+              />
+              {touched.email && errors.email && (
+                <p className="mt-1 text-sm text-red-500 transform transition-all duration-200">{errors.email}</p>
+              )}
             </div>
-            <div>
 
-              <span className='text-md text-gray-500 dark:text-gray-300'>Create New Account? </span>
-              <Link to={"/register"} className='text-blue-500 hover:text-blue-600' >Register</Link>
+            <div className="relative group">
+              <input
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.password}
+                type="password"
+                name="password"
+                id="password"
+                className="appearance-none rounded-lg relative block w-full px-3 py-3 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white dark:bg-dark-primary focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200"
+                placeholder="Password"
+              />
+              {touched.password && errors.password && (
+                <p className="mt-1 text-sm text-red-500 transform transition-all duration-200">{errors.password}</p>
+              )}
             </div>
           </div>
-        </div>
-      </form>
 
+          <div className="flex items-center justify-between">
+            <div className="text-sm">
+              <Link to="/forgetPass" className="font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 dark:hover:text-emerald-300 transition-colors duration-200">
+                Forgot your password?
+              </Link>
+            </div>
+          </div>
 
+          <div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500 transform transition-all duration-200 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? (
+                <i className="fas fa-spinner fa-spin mr-2"></i>
+              ) : (
+                <span className="absolute left-0 inset-y-0 flex items-center pl-3">
+                  <i className="fas fa-lock text-emerald-500 group-hover:text-emerald-400 transition-colors duration-200"></i>
+                </span>
+              )}
+              Sign in
+            </button>
+          </div>
+
+          {errorMsg && (
+            <div className="rounded-md bg-red-50 dark:bg-red-900/50 p-4 transform transition-all duration-200">
+              <p className="text-sm text-red-700 dark:text-red-200">{errorMsg}</p>
+            </div>
+          )}
+
+          {successMsg && (
+            <div className="rounded-md bg-green-50 dark:bg-green-900/50 p-4 transform transition-all duration-200">
+              <p className="text-sm text-green-700 dark:text-green-200">{successMsg}</p>
+            </div>
+          )}
+
+          <div className="text-center">
+            <span className="text-sm text-gray-600 dark:text-gray-400">
+              Don't have an account?{' '}
+              <Link to="/register" className="font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-500 dark:hover:text-emerald-300 transition-colors duration-200">
+                Register now
+              </Link>
+            </span>
+          </div>
+        </form>
+      </div>
     </div>
-  </>
+  )
 }
