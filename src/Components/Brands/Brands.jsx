@@ -52,7 +52,7 @@ export default function Brands() {
                 onClick={() => handleBrandClick(brand)} // Handle click event
               >
                 <img src={brand.image} alt={brand.slug} className="w-full object-contain" />
-                <h2 className="text-lg font-semibold text-center">{brand.slug}</h2>
+                <h2 className="text-lg font-semibold text-center dark:text-black">{brand.slug}</h2>
               </div>
             ))}
           </div>
