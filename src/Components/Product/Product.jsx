@@ -1,31 +1,24 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext } from 'react';
 import RatingStars from '../RatingStars/RatingStars';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../Contexts/AuthContext';
 import { addProductToCart } from '../../cartService';
-import { addProductToWishlist, isProductInWishlist } from '../../wishlistService';
+import { WishlistContext } from '../../Contexts/WishlistContext';
 
 export default function Product({ product, index }) {
     const { userToken } = useContext(AuthContext);
+    const { addToWishlist, removeFromWishlist, isInWishlist } = useContext(WishlistContext);
 
-    // State to track if the product is in the wishlist
-    const [isInWishlist, setIsInWishlist] = useState(false);
-
-    // Effect to check if the product is already in the wishlist
-    useEffect(() => {
-        const checkWishlist = async () => {
-            if (userToken) {
-                const result = await isProductInWishlist(product._id, userToken);
-                setIsInWishlist(result);
-            }
-        };
-        checkWishlist();
-    }, [product._id, userToken]);
+    // Check if the product is in the wishlist using context
+    const isFav = isInWishlist(product._id);
 
     // Handle wishlist click
     const handleWishlistClick = async () => {
-        await addProductToWishlist(product._id, userToken);
-        setIsInWishlist(true); // Update the state after adding to the wishlist
+        if (isFav) {
+            await removeFromWishlist(product._id);
+        } else {
+            await addToWishlist(product._id);
+        }
     };
 
     return (
@@ -50,7 +43,7 @@ export default function Product({ product, index }) {
                                 Add to cart
                             </button>
                             <button onClick={handleWishlistClick}>
-                                <i className={`fa-solid fa-heart text-2xl ${isInWishlist ? 'text-red-500' : 'text-black'}`}></i>
+                                <i className={`fa-solid fa-heart text-2xl ${isFav ? 'text-red-500' : 'text-black'}`}></i>
                             </button>
                         </div>
                     </div>
