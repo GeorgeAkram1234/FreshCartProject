@@ -15,6 +15,7 @@ import Notfound from './Components/Notfound/Notfound.jsx'
 import CounterContextProvider from './Contexts/CounterContext.jsx'
 import AuthContextProvider from './Contexts/AuthContext.jsx'
 import { ThemeProvider } from './Contexts/ThemeContext.jsx'
+import { WishlistProvider } from './Contexts/WishlistContext.jsx'
 import ProtectedRoute from './Components/ProtectedRoute/ProtectedRoute.jsx'
 import ProtectAuthRoutes from './Components/ProtectAuthRoutes/ProtectAuthRoutes.jsx'
 import ProductDetails from './Components/ProductDetails/ProductDetails.jsx'
@@ -64,8 +65,9 @@ function App() {
   return (
     <>
     <QueryClientProvider client={queryClient}>
-    <ThemeProvider>
+      <ThemeProvider>
         <AuthContextProvider>
+          <WishlistProvider>
             <CounterContextProvider>
               <RouterProvider router={routers}></RouterProvider>
               <ToastContainer/>
@@ -75,8 +77,9 @@ function App() {
                 </div>
               </Offline>
             </CounterContextProvider>
-          </AuthContextProvider>
-        </ThemeProvider>
+          </WishlistProvider>
+        </AuthContextProvider>
+      </ThemeProvider>
       <ReactQueryDevtools 
       />
     </QueryClientProvider>
