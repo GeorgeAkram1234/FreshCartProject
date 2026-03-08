@@ -1,0 +1,3 @@
+## 2025-05-14 - [Wishlist Performance Optimization]
+**Learning:** Found a major performance bottleneck where each `Product` component was making an independent API call to `https://ecommerce.routemisr.com/api/v1/wishlist` to check if it was in the user's wishlist. On a page with 40 products, this resulted in 40 redundant network requests.
+**Action:** Centralized wishlist state in a `WishlistContext`. Fetched the wishlist once on application load and stored IDs in a `Set` for O(1) lookups. This reduced network traffic by 97.5% for the wishlist check and improved page responsiveness by eliminating multiple concurrent requests blocking the main thread during initial render.
