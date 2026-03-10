@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import style from './Footer.module.css'
 import logo from '../../assets/images/freshcart-logo.svg';
 

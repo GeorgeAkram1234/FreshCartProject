@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import { useContext, useState } from 'react';
 import style from './Navbar.module.css'; // Make sure to define your styles in Navbar.module.css
 import logo from '../../assets/images/freshcart-logo.svg';
 import { NavLink, useNavigate } from 'react-router-dom';

@@ -1,5 +1,5 @@
 import axios from 'axios'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import Slider from 'react-slick'
 import LoadingScreen from '../LoadingScreen/LoadingScreen'
 

@@ -1,4 +1,4 @@
-import React from 'react'
+/*  */
 
 export default function RatingStars({ rating , index}) {
     return <div key={index} className="flex items-center mt-2.5 mb-5">
