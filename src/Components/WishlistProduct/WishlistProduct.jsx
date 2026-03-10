@@ -1,4 +1,4 @@
-import React from 'react';
+/*  */
 
 function WishlistProduct({ product, productRemove }) {
     return (

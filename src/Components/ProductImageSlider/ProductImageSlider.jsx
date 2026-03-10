@@ -1,4 +1,4 @@
-import React from 'react'
+/*  */
 import Slider from 'react-slick'
 
 
@@ -15,8 +15,8 @@ export default function ProductImageSlider({images }) {
     return (
         <>
             <Slider {...settings }>
-                {images.map((img) => {
-                    return <img className="w-full rounded-md object-contain max-w-lg mx-auto" src={img}  />
+                {images.map((img, index) => {
+                    return <img key={index} className="w-full rounded-md object-contain max-w-lg mx-auto" src={img}  />
                 })}
             </Slider>
         </>

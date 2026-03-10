@@ -1,4 +1,4 @@
-// import React, { useContext, useEffect, useState } from 'react'
+// import { useContext, useEffect, useState } from 'react'
 // import style from './Categories.module.css'
 // import { Helmet } from 'react-helmet'
 // import { AuthContext } from '../../Contexts/AuthContext'
@@ -85,7 +85,7 @@
 // }
 
 
-import React, { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import style from './Categories.module.css';
 import { Helmet } from 'react-helmet';
 import { AuthContext } from '../../Contexts/AuthContext';

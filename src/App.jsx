@@ -1,12 +1,9 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
-import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
+import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Layout from './Components/Layout/Layout.jsx'
 import Home from './Components/Home/Home.jsx'
 import Cart from './Components/Cart/Cart.jsx'
-import Product from './Components/Product/Product.jsx'
 import Categories from './Components/Categories/Categories.jsx'
 import Brands from './Components/Brands/Brands.jsx'
 import Login from './Components/Login/Login.jsx'
@@ -28,6 +25,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import Wishlist from './Components/Wishlist/Wishlist.jsx'
 import ForgetPass from './Components/ForgetPass/ForgetPass.jsx'
 import VerifyCode from './Components/VerifyCode/VerifyCode.jsx'
+import { WishlistProvider } from './Contexts/WishlistContext.jsx'
 
 
 let routers = createBrowserRouter([
@@ -66,6 +64,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
     <ThemeProvider>
         <AuthContextProvider>
+          <WishlistProvider>
             <CounterContextProvider>
               <RouterProvider router={routers}></RouterProvider>
               <ToastContainer/>
@@ -75,6 +74,7 @@ function App() {
                 </div>
               </Offline>
             </CounterContextProvider>
+          </WishlistProvider>
           </AuthContextProvider>
         </ThemeProvider>
       <ReactQueryDevtools 
