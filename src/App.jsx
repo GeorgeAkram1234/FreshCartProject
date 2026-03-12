@@ -15,6 +15,7 @@ import Notfound from './Components/Notfound/Notfound.jsx'
 import CounterContextProvider from './Contexts/CounterContext.jsx'
 import AuthContextProvider from './Contexts/AuthContext.jsx'
 import { ThemeProvider } from './Contexts/ThemeContext.jsx'
+import { WishlistProvider } from './Contexts/WishlistContext.jsx'
 import ProtectedRoute from './Components/ProtectedRoute/ProtectedRoute.jsx'
 import ProtectAuthRoutes from './Components/ProtectAuthRoutes/ProtectAuthRoutes.jsx'
 import ProductDetails from './Components/ProductDetails/ProductDetails.jsx'
@@ -66,15 +67,17 @@ function App() {
     <QueryClientProvider client={queryClient}>
     <ThemeProvider>
         <AuthContextProvider>
-            <CounterContextProvider>
-              <RouterProvider router={routers}></RouterProvider>
-              <ToastContainer/>
-              <Offline>
-                <div className='fixed bottom-4 start-4 rounded-md bg-yellow-200 p-4'>
-                  You are offline
-                </div>
-              </Offline>
-            </CounterContextProvider>
+            <WishlistProvider>
+              <CounterContextProvider>
+                <RouterProvider router={routers}></RouterProvider>
+                <ToastContainer/>
+                <Offline>
+                  <div className='fixed bottom-4 start-4 rounded-md bg-yellow-200 p-4'>
+                    You are offline
+                  </div>
+                </Offline>
+              </CounterContextProvider>
+            </WishlistProvider>
           </AuthContextProvider>
         </ThemeProvider>
       <ReactQueryDevtools 
