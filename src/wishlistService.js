@@ -25,14 +25,33 @@ export async function addProductToWishlist(productId, userToken) {
             theme: "light",
             transition: Bounce,
         });
+
+        return data; // Return data for context to use if needed
         
     } catch (error) {
         console.error("Error adding product to wishlist:", error);
         toast.error("Failed to add product to wishlist. Please try again.");
+        throw error; // Rethrow to allow context to handle rollback
+    }
+}
+
+// Function to remove a product from the wishlist
+export async function removeProductFromWishlist(productId, userToken) {
+    try {
+        let { data } = await axios.delete(`https://ecommerce.routemisr.com/api/v1/wishlist/${productId}`, {
+            headers: {
+                token: userToken,
+            },
+        });
+        return data;
+    } catch (error) {
+        console.error("Error removing product from wishlist:", error);
+        throw error;
     }
 }
 
 // Function to check if a product is in the wishlist
+// DEPRECATED: Use WishlistContext for more efficient check
 export async function isProductInWishlist(productId, userToken) {
     try {
         let { data } = await axios.get(`https://ecommerce.routemisr.com/api/v1/wishlist`, {
