@@ -1,0 +1,3 @@
+## 2025-05-15 - [Wishlist Performance Optimization]
+**Learning:** In applications with long lists of products, having each component perform its own API call or even a simple effect-based check for status (like "is in wishlist") can lead to a significant number of redundant operations and network requests. Centralizing this state in a Context and providing an $O(1)$ lookup structure (like a `Set`) drastically improves performance and reduces overhead.
+**Action:** Always consider global state and efficient data structures (Sets/Maps) for cross-component status checks in product listings. Avoid build artifacts in PRs by ensuring `dist/` is not staged.
