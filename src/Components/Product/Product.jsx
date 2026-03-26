@@ -1,31 +1,25 @@
-import React, { useContext, useState, useEffect } from 'react';
+/* eslint-disable react/prop-types */
+import { useContext } from 'react';
 import RatingStars from '../RatingStars/RatingStars';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../Contexts/AuthContext';
+import { WishlistContext } from '../../Contexts/WishlistContext';
 import { addProductToCart } from '../../cartService';
-import { addProductToWishlist, isProductInWishlist } from '../../wishlistService';
 
 export default function Product({ product, index }) {
     const { userToken } = useContext(AuthContext);
+    const { wishlistIds, addToWishlist, removeFromWishlist } = useContext(WishlistContext);
 
-    // State to track if the product is in the wishlist
-    const [isInWishlist, setIsInWishlist] = useState(false);
-
-    // Effect to check if the product is already in the wishlist
-    useEffect(() => {
-        const checkWishlist = async () => {
-            if (userToken) {
-                const result = await isProductInWishlist(product._id, userToken);
-                setIsInWishlist(result);
-            }
-        };
-        checkWishlist();
-    }, [product._id, userToken]);
+    // Optimized: O(1) lookup in the global wishlist Set instead of redundant API calls
+    const isInWishlist = wishlistIds.has(product._id);
 
     // Handle wishlist click
     const handleWishlistClick = async () => {
-        await addProductToWishlist(product._id, userToken);
-        setIsInWishlist(true); // Update the state after adding to the wishlist
+        if (isInWishlist) {
+            await removeFromWishlist(product._id);
+        } else {
+            await addToWishlist(product);
+        }
     };
 
     return (
