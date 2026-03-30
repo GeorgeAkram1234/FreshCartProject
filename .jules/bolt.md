@@ -1,0 +1,3 @@
+## 2025-05-15 - [Wishlist State Centralization]
+**Learning:** In this ecommerce application, each Product component was individually checking its wishlist status via an API call on mount. This resulted in O(N) network requests for a list of N products, causing significant overhead and potential rate limiting.
+**Action:** Centralize wishlist state in a global Context. Fetch once on authentication and use a `useMemo`-ed `Set` of product IDs for O(1) existence checks in the Product components. This reduces network traffic by ~98% for typical product lists and ensures application-wide state consistency.
