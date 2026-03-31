@@ -1,0 +1,3 @@
+## 2025-05-15 - [Wishlist Performance Optimization]
+**Learning:** The application was suffering from an "N+1 Effects" problem where each `Product` component instance triggered a `useEffect` and an API call (or expensive promise) to check its wishlist status. This caused redundant processing proportional to the number of products on the page (e.g., 40 products = 40 checks).
+**Action:** Centralize wishlist state in a global `WishlistContext`. Use `useMemo` to derive a `Set` of IDs from the wishlist array for $O(1)$ synchronous lookups during component rendering. This eliminates per-component effects and reduces UI lag during list rendering and updates.
