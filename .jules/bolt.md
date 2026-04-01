@@ -1,0 +1,3 @@
+## 2025-05-15 - Redundant API Calls in Component Lists
+**Learning:** Found that the `Product` component was fetching the entire wishlist individually on mount to determine its favorited status. For a list of 20+ products, this created N+1 API requests, all fetching the exact same data. Additionally, `QueryClient` was instantiated inside the `App` component, causing cache loss on every re-render.
+**Action:** Centralized wishlist state in a `WishlistContext` using React Query for global caching and O(1) presence checks with a `Set`. Moved `QueryClient` instantiation outside the `App` component to ensure cache persistence.
