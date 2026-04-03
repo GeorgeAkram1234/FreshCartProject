@@ -14,6 +14,7 @@ import Register from './Components/Register/Register.jsx'
 import Notfound from './Components/Notfound/Notfound.jsx'
 import CounterContextProvider from './Contexts/CounterContext.jsx'
 import AuthContextProvider from './Contexts/AuthContext.jsx'
+import WishlistContextProvider from './Contexts/WishlistContext.jsx'
 import { ThemeProvider } from './Contexts/ThemeContext.jsx'
 import ProtectedRoute from './Components/ProtectedRoute/ProtectedRoute.jsx'
 import ProtectAuthRoutes from './Components/ProtectAuthRoutes/ProtectAuthRoutes.jsx'
@@ -64,20 +65,22 @@ function App() {
   return (
     <>
     <QueryClientProvider client={queryClient}>
-    <ThemeProvider>
+      <ThemeProvider>
         <AuthContextProvider>
+          <WishlistContextProvider>
             <CounterContextProvider>
               <RouterProvider router={routers}></RouterProvider>
-              <ToastContainer/>
+              <ToastContainer />
               <Offline>
                 <div className='fixed bottom-4 start-4 rounded-md bg-yellow-200 p-4'>
                   You are offline
                 </div>
               </Offline>
             </CounterContextProvider>
-          </AuthContextProvider>
-        </ThemeProvider>
-      <ReactQueryDevtools 
+          </WishlistContextProvider>
+        </AuthContextProvider>
+      </ThemeProvider>
+      <ReactQueryDevtools
       />
     </QueryClientProvider>
     </>
