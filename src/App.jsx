@@ -25,6 +25,7 @@ import Orders from './Components/AllOrders/Orders.jsx'
 import { Offline } from 'react-detect-offline'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
+import WishlistContextProvider from './Contexts/WishlistContext.jsx'
 import Wishlist from './Components/Wishlist/Wishlist.jsx'
 import ForgetPass from './Components/ForgetPass/ForgetPass.jsx'
 import VerifyCode from './Components/VerifyCode/VerifyCode.jsx'
@@ -64,21 +65,22 @@ function App() {
   return (
     <>
     <QueryClientProvider client={queryClient}>
-    <ThemeProvider>
+      <ThemeProvider>
         <AuthContextProvider>
+          <WishlistContextProvider>
             <CounterContextProvider>
               <RouterProvider router={routers}></RouterProvider>
-              <ToastContainer/>
+              <ToastContainer />
               <Offline>
                 <div className='fixed bottom-4 start-4 rounded-md bg-yellow-200 p-4'>
                   You are offline
                 </div>
               </Offline>
             </CounterContextProvider>
-          </AuthContextProvider>
-        </ThemeProvider>
-      <ReactQueryDevtools 
-      />
+          </WishlistContextProvider>
+        </AuthContextProvider>
+      </ThemeProvider>
+      <ReactQueryDevtools />
     </QueryClientProvider>
     </>
   )
