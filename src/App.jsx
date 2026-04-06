@@ -1,6 +1,3 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
 import Layout from './Components/Layout/Layout.jsx'
@@ -14,6 +11,7 @@ import Register from './Components/Register/Register.jsx'
 import Notfound from './Components/Notfound/Notfound.jsx'
 import CounterContextProvider from './Contexts/CounterContext.jsx'
 import AuthContextProvider from './Contexts/AuthContext.jsx'
+import WishlistContextProvider from './Contexts/WishlistContext.jsx'
 import { ThemeProvider } from './Contexts/ThemeContext.jsx'
 import ProtectedRoute from './Components/ProtectedRoute/ProtectedRoute.jsx'
 import ProtectAuthRoutes from './Components/ProtectAuthRoutes/ProtectAuthRoutes.jsx'
@@ -55,17 +53,16 @@ let routers = createBrowserRouter([
 
 ])
 
+const queryClient = new QueryClient()
+
 function App() {
-
-  const queryClient = new QueryClient()
-
-
 
   return (
     <>
     <QueryClientProvider client={queryClient}>
-    <ThemeProvider>
+      <ThemeProvider>
         <AuthContextProvider>
+          <WishlistContextProvider>
             <CounterContextProvider>
               <RouterProvider router={routers}></RouterProvider>
               <ToastContainer/>
@@ -75,8 +72,9 @@ function App() {
                 </div>
               </Offline>
             </CounterContextProvider>
-          </AuthContextProvider>
-        </ThemeProvider>
+          </WishlistContextProvider>
+        </AuthContextProvider>
+      </ThemeProvider>
       <ReactQueryDevtools 
       />
     </QueryClientProvider>

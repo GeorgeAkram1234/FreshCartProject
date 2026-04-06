@@ -1,31 +1,24 @@
-import React, { useContext, useState, useEffect } from 'react';
+/* eslint-disable react/prop-types */
+import { useContext } from 'react';
 import RatingStars from '../RatingStars/RatingStars';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../Contexts/AuthContext';
+import { WishlistContext } from '../../Contexts/WishlistContext';
 import { addProductToCart } from '../../cartService';
-import { addProductToWishlist, isProductInWishlist } from '../../wishlistService';
 
 export default function Product({ product, index }) {
     const { userToken } = useContext(AuthContext);
+    const { wishlistIds, addToWishlist, removeFromWishlist } = useContext(WishlistContext);
 
-    // State to track if the product is in the wishlist
-    const [isInWishlist, setIsInWishlist] = useState(false);
+    const isInWishlist = wishlistIds.has(product._id);
 
-    // Effect to check if the product is already in the wishlist
-    useEffect(() => {
-        const checkWishlist = async () => {
-            if (userToken) {
-                const result = await isProductInWishlist(product._id, userToken);
-                setIsInWishlist(result);
-            }
-        };
-        checkWishlist();
-    }, [product._id, userToken]);
-
-    // Handle wishlist click
-    const handleWishlistClick = async () => {
-        await addProductToWishlist(product._id, userToken);
-        setIsInWishlist(true); // Update the state after adding to the wishlist
+    // Handle wishlist toggle
+    const handleWishlistToggle = () => {
+        if (isInWishlist) {
+            removeFromWishlist(product._id);
+        } else {
+            addToWishlist(product._id);
+        }
     };
 
     return (
@@ -49,8 +42,8 @@ export default function Product({ product, index }) {
                             >
                                 Add to cart
                             </button>
-                            <button onClick={handleWishlistClick}>
-                                <i className={`fa-solid fa-heart text-2xl ${isInWishlist ? 'text-red-500' : 'text-black'}`}></i>
+                            <button onClick={handleWishlistToggle}>
+                                <i className={`fa-solid fa-heart text-2xl transition-colors duration-300 ${isInWishlist ? 'text-red-500' : 'text-black'}`}></i>
                             </button>
                         </div>
                     </div>
