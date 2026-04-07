@@ -1,12 +1,8 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
-import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
+import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Layout from './Components/Layout/Layout.jsx'
 import Home from './Components/Home/Home.jsx'
 import Cart from './Components/Cart/Cart.jsx'
-import Product from './Components/Product/Product.jsx'
 import Categories from './Components/Categories/Categories.jsx'
 import Brands from './Components/Brands/Brands.jsx'
 import Login from './Components/Login/Login.jsx'
@@ -14,6 +10,7 @@ import Register from './Components/Register/Register.jsx'
 import Notfound from './Components/Notfound/Notfound.jsx'
 import CounterContextProvider from './Contexts/CounterContext.jsx'
 import AuthContextProvider from './Contexts/AuthContext.jsx'
+import WishlistContextProvider from './Contexts/WishlistContext.jsx'
 import { ThemeProvider } from './Contexts/ThemeContext.jsx'
 import ProtectedRoute from './Components/ProtectedRoute/ProtectedRoute.jsx'
 import ProtectAuthRoutes from './Components/ProtectAuthRoutes/ProtectAuthRoutes.jsx'
@@ -33,7 +30,6 @@ import VerifyCode from './Components/VerifyCode/VerifyCode.jsx'
 let routers = createBrowserRouter([
   {
     path: '', element: <Layout />, children: [
-      // {path:'' , element:<Navigate to={'home'}/>},
       { index: true, element: <ProtectedRoute><Home/></ProtectedRoute> },
       { path: 'cart', element: <ProtectedRoute><Cart /></ProtectedRoute> },
       { path: 'wishlist', element: <ProtectedRoute><Wishlist /></ProtectedRoute> },
@@ -66,6 +62,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
     <ThemeProvider>
         <AuthContextProvider>
+          <WishlistContextProvider>
             <CounterContextProvider>
               <RouterProvider router={routers}></RouterProvider>
               <ToastContainer/>
@@ -75,6 +72,7 @@ function App() {
                 </div>
               </Offline>
             </CounterContextProvider>
+          </WishlistContextProvider>
           </AuthContextProvider>
         </ThemeProvider>
       <ReactQueryDevtools 
