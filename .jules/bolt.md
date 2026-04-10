@@ -1,0 +1,3 @@
+## 2025-05-15 - [Centralized Wishlist State]
+**Learning:** In a large product list, having each product card individually check the wishlist status via an API call creates an O(N) request overhead (N+1 problem). Centralizing this state in a Context with React Query allows for a single cached fetch. Using a `Set` for these IDs in the context further optimizes the lookup to O(1) during the render of each product card.
+**Action:** Always look for patterns where individual list items are making redundant API calls for the same global state, and centralize them using a Context/Cache with efficient lookup structures like Sets or Maps.
