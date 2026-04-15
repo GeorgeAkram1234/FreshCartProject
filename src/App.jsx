@@ -28,6 +28,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import Wishlist from './Components/Wishlist/Wishlist.jsx'
 import ForgetPass from './Components/ForgetPass/ForgetPass.jsx'
 import VerifyCode from './Components/VerifyCode/VerifyCode.jsx'
+import WishlistContextProvider from './Contexts/WishlistContext.jsx'
 
 
 let routers = createBrowserRouter([
@@ -63,23 +64,24 @@ function App() {
 
   return (
     <>
-    <QueryClientProvider client={queryClient}>
-    <ThemeProvider>
-        <AuthContextProvider>
-            <CounterContextProvider>
-              <RouterProvider router={routers}></RouterProvider>
-              <ToastContainer/>
-              <Offline>
-                <div className='fixed bottom-4 start-4 rounded-md bg-yellow-200 p-4'>
-                  You are offline
-                </div>
-              </Offline>
-            </CounterContextProvider>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>
+          <AuthContextProvider>
+            <WishlistContextProvider>
+              <CounterContextProvider>
+                <RouterProvider router={routers}></RouterProvider>
+                <ToastContainer />
+                <Offline>
+                  <div className='fixed bottom-4 start-4 rounded-md bg-yellow-200 p-4'>
+                    You are offline
+                  </div>
+                </Offline>
+              </CounterContextProvider>
+            </WishlistContextProvider>
           </AuthContextProvider>
         </ThemeProvider>
-      <ReactQueryDevtools 
-      />
-    </QueryClientProvider>
+        <ReactQueryDevtools />
+      </QueryClientProvider>
     </>
   )
 }
