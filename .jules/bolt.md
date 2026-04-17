@@ -1,0 +1,3 @@
+## 2026-04-17 - Eliminate N+1 Wishlist API Calls
+**Learning:** Each `Product` component was independently fetching the entire wishlist to check its status, causing a massive performance bottleneck with redundant network requests (N+1 problem). This is a common anti-pattern in React apps where child components perform their own data fetching without coordination.
+**Action:** Use a centralized state management or caching library like React Query (TanStack Query) to deduplicate and cache requests. By using a shared query key (e.g., `['wishlist', userToken]`), multiple components can "subscribe" to the same data, resulting in only one network request and synchronized UI state across the application.
