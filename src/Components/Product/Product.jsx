@@ -1,31 +1,37 @@
-import React, { useContext, useState, useEffect } from 'react';
+/* eslint-disable react/prop-types */
+import { useContext } from 'react';
 import RatingStars from '../RatingStars/RatingStars';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../Contexts/AuthContext';
 import { addProductToCart } from '../../cartService';
-import { addProductToWishlist, isProductInWishlist } from '../../wishlistService';
+import { addProductToWishlist, getWishlist } from '../../wishlistService';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 export default function Product({ product, index }) {
     const { userToken } = useContext(AuthContext);
+    const queryClient = useQueryClient();
 
-    // State to track if the product is in the wishlist
-    const [isInWishlist, setIsInWishlist] = useState(false);
+    /**
+     * BOLT OPTIMIZATION:
+     * Use React Query to fetch and cache the wishlist.
+     * This eliminates the N+1 network request problem where each Product card
+     * would previously trigger its own individual wishlist API call.
+     * React Query deduplicates these requests, resulting in only 1 request for all products.
+     */
+    const { data: wishlist } = useQuery({
+        queryKey: ['wishlist', userToken],
+        queryFn: () => getWishlist(userToken),
+        enabled: !!userToken,
+        staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+    });
 
-    // Effect to check if the product is already in the wishlist
-    useEffect(() => {
-        const checkWishlist = async () => {
-            if (userToken) {
-                const result = await isProductInWishlist(product._id, userToken);
-                setIsInWishlist(result);
-            }
-        };
-        checkWishlist();
-    }, [product._id, userToken]);
+    const isInWishlist = wishlist?.some(item => (item._id || item.id) === product._id);
 
     // Handle wishlist click
     const handleWishlistClick = async () => {
         await addProductToWishlist(product._id, userToken);
-        setIsInWishlist(true); // Update the state after adding to the wishlist
+        // Invalidate wishlist query to trigger a background refresh and update all product cards
+        queryClient.invalidateQueries({ queryKey: ['wishlist', userToken] });
     };
 
     return (
