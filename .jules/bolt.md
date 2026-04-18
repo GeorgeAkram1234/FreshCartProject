@@ -1,0 +1,3 @@
+## 2025-05-15 - [Consolidated Wishlist API with React Query]
+**Learning:** Found an N+1 performance bottleneck where every `Product` component was independently calling the wishlist API on mount to check if it was favorited. This resulted in dozens of redundant network requests on the Home and Products pages.
+**Action:** Centralized wishlist logic in `wishlistService.js` and implemented React Query in `Product.jsx` and `Wishlist.jsx`. By sharing the `['wishlist', userToken]` query key, React Query deduplicates these requests into a single network call per page load and keeps the favorited state in sync globally across the app.
