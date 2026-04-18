@@ -1,31 +1,43 @@
-import React, { useContext, useState, useEffect } from 'react';
+import { useContext } from 'react';
 import RatingStars from '../RatingStars/RatingStars';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../Contexts/AuthContext';
 import { addProductToCart } from '../../cartService';
-import { addProductToWishlist, isProductInWishlist } from '../../wishlistService';
+import { addProductToWishlist, getWishlist, isProductInWishlistArray, removeProductFromWishlist } from '../../wishlistService';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+/* eslint-disable react/prop-types */
 export default function Product({ product, index }) {
     const { userToken } = useContext(AuthContext);
+    const queryClient = useQueryClient();
 
-    // State to track if the product is in the wishlist
-    const [isInWishlist, setIsInWishlist] = useState(false);
+    // ⚡ Optimization: Use React Query to fetch and cache wishlist.
+    // This eliminates the N+1 API calls by sharing the same cache entry across all Product components.
+    const { data: wishlist } = useQuery({
+        queryKey: ['wishlist', userToken],
+        queryFn: () => getWishlist(userToken),
+        enabled: !!userToken,
+    });
 
-    // Effect to check if the product is already in the wishlist
-    useEffect(() => {
-        const checkWishlist = async () => {
-            if (userToken) {
-                const result = await isProductInWishlist(product._id, userToken);
-                setIsInWishlist(result);
+    const isInWishlist = isProductInWishlistArray(wishlist, product._id);
+
+    // Mutation for toggling wishlist status
+    const wishlistMutation = useMutation({
+        mutationFn: async () => {
+            if (isInWishlist) {
+                return removeProductFromWishlist(product._id, userToken);
+            } else {
+                return addProductToWishlist(product._id, userToken);
             }
-        };
-        checkWishlist();
-    }, [product._id, userToken]);
+        },
+        onSuccess: () => {
+            // Invalidate and refetch wishlist to keep UI in sync
+            queryClient.invalidateQueries({ queryKey: ['wishlist', userToken] });
+        },
+    });
 
-    // Handle wishlist click
-    const handleWishlistClick = async () => {
-        await addProductToWishlist(product._id, userToken);
-        setIsInWishlist(true); // Update the state after adding to the wishlist
+    const handleWishlistToggle = () => {
+        wishlistMutation.mutate();
     };
 
     return (
@@ -49,8 +61,12 @@ export default function Product({ product, index }) {
                             >
                                 Add to cart
                             </button>
-                            <button onClick={handleWishlistClick}>
-                                <i className={`fa-solid fa-heart text-2xl ${isInWishlist ? 'text-red-500' : 'text-black'}`}></i>
+                            <button
+                                onClick={handleWishlistToggle}
+                                disabled={wishlistMutation.isPending}
+                                className="transition-transform active:scale-90"
+                            >
+                                <i className={`fa-solid fa-heart text-2xl ${isInWishlist ? 'text-red-500' : 'text-black dark:text-gray-400'}`}></i>
                             </button>
                         </div>
                     </div>
