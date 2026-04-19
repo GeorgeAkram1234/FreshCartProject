@@ -1,6 +1,3 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
 import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
 import Layout from './Components/Layout/Layout.jsx'
@@ -55,11 +52,9 @@ let routers = createBrowserRouter([
 
 ])
 
+const queryClient = new QueryClient()
+
 function App() {
-
-  const queryClient = new QueryClient()
-
-
 
   return (
     <>

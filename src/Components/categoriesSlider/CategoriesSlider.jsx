@@ -1,5 +1,5 @@
 import axios from 'axios'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import Slider from 'react-slick'
 import LoadingScreen from '../LoadingScreen/LoadingScreen'
 
@@ -82,6 +82,7 @@ export default function CategoriesSlider() {
                                     src={category?.image} 
                                     className='w-full h-[150px] sm:h-[180px] object-cover' 
                                     alt={category?.name} 
+                                    loading="lazy"
                                 />
                             </div>
                             <div className="p-3 text-center">
