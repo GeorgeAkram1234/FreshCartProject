@@ -32,25 +32,30 @@ export async function addProductToWishlist(productId, userToken) {
     }
 }
 
-// Function to check if a product is in the wishlist
+// Function to get the user's wishlist
+export async function getWishlist(userToken) {
+    const { data } = await axios.get(`https://ecommerce.routemisr.com/api/v1/wishlist`, {
+        headers: {
+            token: userToken,
+        },
+    });
+    return data;
+}
+
+// Function to check if a product is in the wishlist array
+export function isProductInWishlistArray(wishlist, productId) {
+    if (!Array.isArray(wishlist)) return false;
+    return wishlist.some(item => item._id === productId || item.id === productId);
+}
+
+// Function to check if a product is in the wishlist (legacy/convenience)
 export async function isProductInWishlist(productId, userToken) {
     try {
-        let { data } = await axios.get(`https://ecommerce.routemisr.com/api/v1/wishlist`, {
-            headers: {
-                token: userToken,
-            },
-        });
-
-        // Assuming data.wishlist contains an array of wishlist products
-        const wishlist = data.wishlist || [];
-
-        // Check if the productId exists in the wishlist
-        const productInWishlist = wishlist.some(item => item._id === productId);
-
-        return productInWishlist;
-
+        const data = await getWishlist(userToken);
+        const wishlist = data.data || [];
+        return isProductInWishlistArray(wishlist, productId);
     } catch (error) {
         console.error("Error checking wishlist:", error);
-        return false; // Return false in case of an error
+        return false;
     }
 }
