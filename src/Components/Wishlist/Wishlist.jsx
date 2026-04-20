@@ -1,17 +1,17 @@
-import React, { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 import { toast, Bounce } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'; // Ensure you have this import for toastify styles
 import { addProductToCart } from '../../cartService';
 import { Link } from 'react-router-dom';
-import ProductDetails from '../ProductDetails/ProductDetails';
 import LoadingScreen from '../LoadingScreen/LoadingScreen'
 import { AuthContext } from '../../Contexts/AuthContext';
 import { Helmet } from 'react-helmet';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function WishList() {
 
-
+  const queryClient = useQueryClient();
   let { userToken } = useContext(AuthContext)
 
 
@@ -22,6 +22,7 @@ export default function WishList() {
 
   useEffect(() => {
     getUserWishlist();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
 
@@ -64,8 +65,6 @@ export default function WishList() {
         theme: "light",
         transition: Bounce,
       });
-    } finally {
-
     }
     setIsLoading(false)
   }
@@ -79,6 +78,8 @@ export default function WishList() {
       });
       // After removing a product, refetch the wishlist
       getUserWishlist();
+      // Also invalidate the query cache used in Product components
+      queryClient.invalidateQueries({ queryKey: ['wishlist', userToken] });
       toast.success("Product removed from wishlist successfully", {
         position: "top-right",
         autoClose: 5000,
