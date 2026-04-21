@@ -32,25 +32,71 @@ export async function addProductToWishlist(productId, userToken) {
     }
 }
 
-// Function to check if a product is in the wishlist
-export async function isProductInWishlist(productId, userToken) {
+// Function to get the user's wishlist
+export async function getWishlist(userToken) {
     try {
-        let { data } = await axios.get(`https://ecommerce.routemisr.com/api/v1/wishlist`, {
+        const { data } = await axios.get("https://ecommerce.routemisr.com/api/v1/wishlist", {
+            headers: {
+                token: userToken
+            },
+        });
+        return data.data;
+    } catch (error) {
+        console.error("Error fetching wishlist:", error);
+        throw error;
+    }
+}
+
+// Function to remove a product from the wishlist
+export async function removeProductFromWishlist(productId, userToken) {
+    try {
+        const { data } = await axios.delete(`https://ecommerce.routemisr.com/api/v1/wishlist/${productId}`, {
             headers: {
                 token: userToken,
             },
         });
 
-        // Assuming data.wishlist contains an array of wishlist products
-        const wishlist = data.wishlist || [];
-
-        // Check if the productId exists in the wishlist
-        const productInWishlist = wishlist.some(item => item._id === productId);
-
-        return productInWishlist;
-
+        toast.success(data.message || "Product removed from wishlist successfully", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            transition: Bounce,
+        });
+        return data;
     } catch (error) {
-        console.error("Error checking wishlist:", error);
-        return false; // Return false in case of an error
+        console.error("Error removing product from wishlist:", error);
+        toast.error("Failed to remove product from wishlist", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: true,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            transition: Bounce,
+        });
+        throw error;
+    }
+}
+
+// Helper to check if a product is in a wishlist array
+export function isProductInWishlistArray(wishlist, productId) {
+    if (!Array.isArray(wishlist)) return false;
+    return wishlist.some(item => item._id === productId || item.id === productId);
+}
+
+// Deprecated: Function to check if a product is in the wishlist (makes an API call)
+export async function isProductInWishlist(productId, userToken) {
+    try {
+        const wishlist = await getWishlist(userToken);
+        return isProductInWishlistArray(wishlist, productId);
+    } catch (error) {
+        return false;
     }
 }
