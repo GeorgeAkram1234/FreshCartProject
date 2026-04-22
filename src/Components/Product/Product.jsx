@@ -1,31 +1,30 @@
-import React, { useContext, useState, useEffect } from 'react';
+/* eslint-disable react/prop-types */
+import { useContext } from 'react';
 import RatingStars from '../RatingStars/RatingStars';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../Contexts/AuthContext';
 import { addProductToCart } from '../../cartService';
-import { addProductToWishlist, isProductInWishlist } from '../../wishlistService';
+import { addProductToWishlist, getWishlist, isProductInWishlistArray } from '../../wishlistService';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 export default function Product({ product, index }) {
     const { userToken } = useContext(AuthContext);
+    const queryClient = useQueryClient();
 
-    // State to track if the product is in the wishlist
-    const [isInWishlist, setIsInWishlist] = useState(false);
+    // Use React Query to fetch the wishlist, deduplicating the request across all Product instances
+    const { data: wishlist } = useQuery({
+        queryKey: ['wishlist', userToken],
+        queryFn: () => getWishlist(userToken),
+        enabled: !!userToken,
+    });
 
-    // Effect to check if the product is already in the wishlist
-    useEffect(() => {
-        const checkWishlist = async () => {
-            if (userToken) {
-                const result = await isProductInWishlist(product._id, userToken);
-                setIsInWishlist(result);
-            }
-        };
-        checkWishlist();
-    }, [product._id, userToken]);
+    const isInWishlist = isProductInWishlistArray(wishlist, product._id);
 
     // Handle wishlist click
     const handleWishlistClick = async () => {
         await addProductToWishlist(product._id, userToken);
-        setIsInWishlist(true); // Update the state after adding to the wishlist
+        // Invalidate the wishlist query to refetch and update all UI components
+        queryClient.invalidateQueries({ queryKey: ['wishlist', userToken] });
     };
 
     return (

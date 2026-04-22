@@ -1,84 +1,36 @@
-import React, { useContext, useEffect, useState } from 'react';
+import { useContext } from 'react';
 import axios from 'axios';
 import { toast, Bounce } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css'; // Ensure you have this import for toastify styles
 import { addProductToCart } from '../../cartService';
 import { Link } from 'react-router-dom';
-import ProductDetails from '../ProductDetails/ProductDetails';
 import LoadingScreen from '../LoadingScreen/LoadingScreen'
 import { AuthContext } from '../../Contexts/AuthContext';
 import { Helmet } from 'react-helmet';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { getWishlist } from '../../wishlistService';
 
 export default function WishList() {
 
 
   let { userToken } = useContext(AuthContext)
+  const queryClient = useQueryClient();
 
-
-  const [wishlist, setWishlist] = useState([]);
-
-  const [isLoading, setIsLoading] = useState(true)
-
-
-  useEffect(() => {
-    getUserWishlist();
-  }, []);
-
-
-  async function getUserWishlist() {
-    try {
-      const { data } = await axios.get("https://ecommerce.routemisr.com/api/v1/wishlist", {
-        headers: {
-          token: userToken
-        },
-      });
-
-      // Check if data and data.wishlist exist and is an array
-      if (data && Array.isArray(data.data)) {
-        setWishlist(data.data);
-      } else {
-        // console.error("Unexpected data format:", data);
-        toast.error("Unexpected data format received", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-          transition: Bounce,
-        });
-        setWishlist([]); // Set empty array on unexpected data format
-      }
-    } catch (error) {
-      // console.error("Error fetching wishlist:", error);
-      toast.error("Failed to fetch wishlist", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-        transition: Bounce,
-      });
-    } finally {
-
-    }
-    setIsLoading(false)
-  }
+  const { data: wishlist = [], isLoading } = useQuery({
+    queryKey: ['wishlist', userToken],
+    queryFn: () => getWishlist(userToken),
+    enabled: !!userToken,
+  });
 
   async function productRemove(productId) {
     try {
       await axios.delete(`https://ecommerce.routemisr.com/api/v1/wishlist/${productId}`, {
         headers: {
-          token: localStorage.getItem("token"),
+          token: userToken,
         },
       });
-      // After removing a product, refetch the wishlist
-      getUserWishlist();
+      // After removing a product, invalidate the query to refetch the wishlist
+      queryClient.invalidateQueries({ queryKey: ['wishlist', userToken] });
       toast.success("Product removed from wishlist successfully", {
         position: "top-right",
         autoClose: 5000,
