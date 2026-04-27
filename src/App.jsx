@@ -1,12 +1,8 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
-import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
+import { createBrowserRouter, RouterProvider, Navigate } from 'react-router-dom'
 import Layout from './Components/Layout/Layout.jsx'
 import Home from './Components/Home/Home.jsx'
 import Cart from './Components/Cart/Cart.jsx'
-import Product from './Components/Product/Product.jsx'
 import Categories from './Components/Categories/Categories.jsx'
 import Brands from './Components/Brands/Brands.jsx'
 import Login from './Components/Login/Login.jsx'
@@ -33,8 +29,8 @@ import VerifyCode from './Components/VerifyCode/VerifyCode.jsx'
 let routers = createBrowserRouter([
   {
     path: '', element: <Layout />, children: [
-      // {path:'' , element:<Navigate to={'home'}/>},
-      { index: true, element: <ProtectedRoute><Home/></ProtectedRoute> },
+      {path:'' , element:<Navigate to={'home'}/>},
+      { path: 'home', element: <ProtectedRoute><Home/></ProtectedRoute> },
       { path: 'cart', element: <ProtectedRoute><Cart /></ProtectedRoute> },
       { path: 'wishlist', element: <ProtectedRoute><Wishlist /></ProtectedRoute> },
       { path: 'products', element: <ProtectedRoute><Products /></ProtectedRoute> },
@@ -55,9 +51,9 @@ let routers = createBrowserRouter([
 
 ])
 
-function App() {
+const queryClient = new QueryClient()
 
-  const queryClient = new QueryClient()
+function App() {
 
 
 
