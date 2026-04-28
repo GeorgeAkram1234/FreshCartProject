@@ -1,31 +1,37 @@
-import React, { useContext, useState, useEffect } from 'react';
+/* eslint-disable react/prop-types */
+import { useContext } from 'react';
 import RatingStars from '../RatingStars/RatingStars';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../Contexts/AuthContext';
 import { addProductToCart } from '../../cartService';
-import { addProductToWishlist, isProductInWishlist } from '../../wishlistService';
+import { addProductToWishlist, getWishlist, isProductInWishlistArray } from '../../wishlistService';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 
 export default function Product({ product, index }) {
     const { userToken } = useContext(AuthContext);
+    const queryClient = useQueryClient();
 
-    // State to track if the product is in the wishlist
-    const [isInWishlist, setIsInWishlist] = useState(false);
+    // Use React Query to fetch the wishlist once and share it across all Product components
+    const { data: wishlist } = useQuery({
+        queryKey: ['wishlist', userToken],
+        queryFn: () => getWishlist(userToken),
+        enabled: !!userToken,
+    });
 
-    // Effect to check if the product is already in the wishlist
-    useEffect(() => {
-        const checkWishlist = async () => {
-            if (userToken) {
-                const result = await isProductInWishlist(product._id, userToken);
-                setIsInWishlist(result);
-            }
-        };
-        checkWishlist();
-    }, [product._id, userToken]);
+    const isInWishlist = isProductInWishlistArray(wishlist, product._id);
+
+    // Mutation for adding product to wishlist
+    const wishlistMutation = useMutation({
+        mutationFn: () => addProductToWishlist(product._id, userToken),
+        onSuccess: () => {
+            // Invalidate the wishlist query to refetch the updated wishlist
+            queryClient.invalidateQueries({ queryKey: ['wishlist', userToken] });
+        },
+    });
 
     // Handle wishlist click
-    const handleWishlistClick = async () => {
-        await addProductToWishlist(product._id, userToken);
-        setIsInWishlist(true); // Update the state after adding to the wishlist
+    const handleWishlistClick = () => {
+        wishlistMutation.mutate();
     };
 
     return (
@@ -49,7 +55,7 @@ export default function Product({ product, index }) {
                             >
                                 Add to cart
                             </button>
-                            <button onClick={handleWishlistClick}>
+                            <button onClick={handleWishlistClick} disabled={wishlistMutation.isPending}>
                                 <i className={`fa-solid fa-heart text-2xl ${isInWishlist ? 'text-red-500' : 'text-black'}`}></i>
                             </button>
                         </div>

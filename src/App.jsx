@@ -55,9 +55,9 @@ let routers = createBrowserRouter([
 
 ])
 
-function App() {
+const queryClient = new QueryClient()
 
-  const queryClient = new QueryClient()
+function App() {
 
 
 
