@@ -1,8 +1,4 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
+import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Layout from './Components/Layout/Layout.jsx'
 import Home from './Components/Home/Home.jsx'
 import Cart from './Components/Cart/Cart.jsx'
@@ -28,6 +24,7 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import Wishlist from './Components/Wishlist/Wishlist.jsx'
 import ForgetPass from './Components/ForgetPass/ForgetPass.jsx'
 import VerifyCode from './Components/VerifyCode/VerifyCode.jsx'
+import './App.css'
 
 
 let routers = createBrowserRouter([
@@ -55,11 +52,9 @@ let routers = createBrowserRouter([
 
 ])
 
+const queryClient = new QueryClient()
+
 function App() {
-
-  const queryClient = new QueryClient()
-
-
 
   return (
     <>
