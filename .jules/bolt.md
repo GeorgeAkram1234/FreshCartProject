@@ -1,0 +1,3 @@
+## 2025-05-14 - [React Query for Wishlist Deduplication]
+**Learning:** In scenarios where multiple components (e.g., individual Product cards) need to check a shared piece of state that requires an API call (like "is this product in my wishlist?"), each component instance would normally trigger its own request, leading to an N+1 API call bottleneck. Implementing React Query with a shared query key (e.g., `['wishlist', userToken]`) allows the frontend to deduplicate these requests into a single network call and share the cached result across all instances.
+**Action:** Use React Query for any repetitive API calls across multiple component instances. Ensure the QueryClient is initialized outside the main App component to preserve cache across re-renders.
