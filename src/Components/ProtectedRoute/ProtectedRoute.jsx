@@ -1,12 +1,14 @@
-import React, { useContext } from 'react'
+/* eslint-disable react/prop-types */
+import { useContext } from 'react'
+import { Navigate } from 'react-router-dom'
 import { AuthContext } from '../../Contexts/AuthContext'
-import Login from '../Login/Login'
 
 export default function ProtectedRoute({ children }) {
-    const {userToken}= useContext(AuthContext)
-    return (
-        <>
-            {userToken ? children : <Login/>}
-        </>
-    )
+    const { userToken } = useContext(AuthContext)
+
+    if (userToken) {
+        return <>{children}</>
+    } else {
+        return <Navigate to="/login" />
+    }
 }
