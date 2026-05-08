@@ -1,0 +1,3 @@
+## 2025-05-15 - [Code Splitting and Stable QueryClient]
+**Learning:** Implementing route-based code splitting with React.lazy and Suspense significantly reduced the main bundle size from ~499kB to ~273kB. Stabilizing the QueryClient with useState prevents cache loss and unnecessary client recreation on App re-renders. Navigating with `<Navigate />` in ProtectedRoute instead of direct component rendering allows for effective code splitting of the redirected component.
+**Action:** Always prefer route-based code splitting for large applications and ensure QueryClient is instantiated once (lazy initialization) to maintain state consistency. Use `<Navigate />` for redirects to avoid static imports that block code splitting.
