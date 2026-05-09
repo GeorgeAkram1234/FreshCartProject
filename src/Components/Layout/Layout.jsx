@@ -1,9 +1,6 @@
-import React from 'react'
-import style from './Layout.module.css'
+import { Outlet } from 'react-router-dom'
 import Navbar from '../Navbar/Navbar.jsx'
 import Footer from '../Footer/Footer.jsx'
-import { Outlet } from 'react-router-dom'
-import ThemeToggle from '../ThemeToggle/ThemeToggle'
 
 export default function Layout() {
   return (
