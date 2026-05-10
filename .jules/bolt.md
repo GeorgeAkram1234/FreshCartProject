@@ -1,0 +1,3 @@
+## 2025-05-10 - Optimizing N+1 Wishlist API Calls with React Query
+**Learning:** In list-based UIs where each item needs to check its state against a global collection (like a wishlist), performing individual API calls per component creates a massive N+1 network bottleneck. Centralizing this state using React Query with a shared query key allows for automatic request deduplication and cache sharing across all instances of the component.
+**Action:** Always look for patterns where multiple components fetch the same data independently and migrate them to a shared React Query cache to minimize network overhead.
