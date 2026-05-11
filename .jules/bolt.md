@@ -1,0 +1,3 @@
+## 2025-05-22 - [Data Fetching & Cache Management]
+**Learning:** In a large component tree, making individual API calls for shared state (like a wishlist) creates an N+1 network bottleneck. Migrating to a shared query cache (React Query) solves this but requires careful 'QueryClient' instantiation with lazy initialization ('useState') to prevent cache loss on re-renders. Additionally, build artifacts ('dist/') must be strictly excluded from source PRs to maintain repository hygiene.
+**Action:** Always prefer deduplicated queries for shared state and ensure 'QueryClient' is preserved across renders using state. Add 'dist' to '.gitignore' and verify Git index before submission.

@@ -1,54 +1,38 @@
-import React, { useEffect, useState } from 'react'
+import { useState } from 'react'
 import logo from '../../assets/images/freshcart-logo.svg';
-import style from './Home.module.css'
 import axios from 'axios'
 import Product from '../Product/Product'
 import LoadingScreen from '../LoadingScreen/LoadingScreen'
 import { Helmet } from 'react-helmet'
 import CategoriesSlider from '../categoriesSlider/CategoriesSlider';
 import MainSlider from '../MainSlider/MainSlider';
+import { useQuery } from '@tanstack/react-query';
 
 export default function Home() {
-
-
-
-  const [products, setProducts] = useState([])
-  const [filteredProducts, setFilteredProducts] = useState([])
-  const [loading, setLoading] = useState(true)
   const [searchInput, setSearchInput] = useState('')
 
-  async function getProducts() {
-    setLoading(true)
-    try {
-      let { data } = await axios.get(`https://ecommerce.routemisr.com/api/v1/products`)
-      setProducts(data.data)
-      setFilteredProducts(data.data)
-    } catch (error) {
-      console.error("Error fetching products:", error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    getProducts()
-  }, [])
+  const { data: products, isLoading } = useQuery({
+    queryKey: ['products'],
+    queryFn: async () => {
+      const { data } = await axios.get(`https://ecommerce.routemisr.com/api/v1/products`)
+      return data.data
+    },
+    staleTime: 600000, // Cache for 10 minutes
+  })
 
   const handleSearch = (e) => {
-    const searchTerm = e.target.value.toLowerCase()
-    setSearchInput(searchTerm)
-
-    const filtered = products.filter(product => {
-      const name = product.title?.toLowerCase() || ''
-      const description = product.description?.toLowerCase() || ''
-      return name.includes(searchTerm) || description.includes(searchTerm)
-    })
-    setFilteredProducts(filtered)
+    setSearchInput(e.target.value.toLowerCase())
   }
+
+  const filteredProducts = products?.filter(product => {
+    const searchTerm = searchInput.toLowerCase()
+    const name = product.title?.toLowerCase() || ''
+    const description = product.description?.toLowerCase() || ''
+    return name.includes(searchTerm) || description.includes(searchTerm)
+  }) || []
 
   return <>
     <div className='overflow-hidden'>
-
       <MainSlider />
       <CategoriesSlider />
     </div>
@@ -64,7 +48,7 @@ export default function Home() {
         />
       </div>
 
-      {loading ? (
+      {isLoading ? (
         <LoadingScreen />
       ) : (
         <div className='container mx-auto grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-3'>
@@ -74,7 +58,6 @@ export default function Home() {
         </div>
       )}
     </div>
-
 
     <Helmet>
       <title>Home</title>

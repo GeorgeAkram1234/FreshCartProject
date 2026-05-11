@@ -1,46 +1,32 @@
 import { useQuery } from '@tanstack/react-query'
 import axios from 'axios'
-import React, { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Helmet } from 'react-helmet'
 import Product from '../Product/Product'
 import LoadingScreen from '../LoadingScreen/LoadingScreen'
 
 export default function Products() {
     const [searchInput, setSearchInput] = useState('')
-    const [products, setProducts] = useState([])
-    const [filteredProducts, setFilteredProducts] = useState([])
-    const [loading, setLoading] = useState(true)
 
-    async function getProducts() {
-        setLoading(true)
-        try {
-            let { data } = await axios.get(`https://ecommerce.routemisr.com/api/v1/products`)
-            setProducts(data.data)
-            console.log(data.data);
-            
-            setFilteredProducts(data.data)
-        } catch (error) {
-            console.error("Error fetching products:", error)
-        } finally {
-            setLoading(false)
-        }
-    }
-
-    useEffect(() => {
-        getProducts()
-    }, [])
+    const { data: products, isLoading } = useQuery({
+        queryKey: ['products'],
+        queryFn: async () => {
+            const { data } = await axios.get(`https://ecommerce.routemisr.com/api/v1/products`)
+            return data.data
+        },
+        staleTime: 600000, // Cache for 10 minutes
+    })
 
     const handleSearch = (e) => {
-        const searchTerm = e.target.value.toLowerCase()
-        setSearchInput(searchTerm)
-        
-        const filtered = products.filter(product => {
-            const name = product.title?.toLowerCase() || ''
-            const description = product.description?.toLowerCase() || ''
-            return name.includes(searchTerm) || description.includes(searchTerm)
-        })
-        setFilteredProducts(filtered)
+        setSearchInput(e.target.value.toLowerCase())
     }
+
+    const filteredProducts = products?.filter(product => {
+        const searchTerm = searchInput.toLowerCase()
+        const name = product.title?.toLowerCase() || ''
+        const description = product.description?.toLowerCase() || ''
+        return name.includes(searchTerm) || description.includes(searchTerm)
+    }) || []
 
     return (
         <>
@@ -55,7 +41,7 @@ export default function Products() {
             </div>
             <div className="w-11/12 mx-auto">
                 {
-                    loading ? <LoadingScreen /> : 
+                    isLoading ? <LoadingScreen /> :
                     <div className='grid md:grid-cols-2 lg:grid-cols-4 gap-3'>
                         {filteredProducts.map((product, index) => {
                             return <Product product={product} key={product.id || index} />
