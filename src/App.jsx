@@ -1,12 +1,9 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
-import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
+import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Layout from './Components/Layout/Layout.jsx'
 import Home from './Components/Home/Home.jsx'
 import Cart from './Components/Cart/Cart.jsx'
-import Product from './Components/Product/Product.jsx'
 import Categories from './Components/Categories/Categories.jsx'
 import Brands from './Components/Brands/Brands.jsx'
 import Login from './Components/Login/Login.jsx'
@@ -57,7 +54,13 @@ let routers = createBrowserRouter([
 
 function App() {
 
-  const queryClient = new QueryClient()
+  const [queryClient] = useState(() => new QueryClient({
+    defaultOptions: {
+      queries: {
+        refetchOnWindowFocus: false,
+      },
+    },
+  }))
 
 
 
