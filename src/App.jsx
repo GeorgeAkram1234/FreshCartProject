@@ -57,7 +57,7 @@ let routers = createBrowserRouter([
 
 function App() {
 
-  const queryClient = new QueryClient()
+  const [queryClient] = useState(() => new QueryClient())
 
 
 
