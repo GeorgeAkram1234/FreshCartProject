@@ -1,31 +1,49 @@
-import React, { useContext, useState, useEffect } from 'react';
+/* eslint-disable react/prop-types */
+import { useContext } from 'react';
 import RatingStars from '../RatingStars/RatingStars';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../Contexts/AuthContext';
 import { addProductToCart } from '../../cartService';
-import { addProductToWishlist, isProductInWishlist } from '../../wishlistService';
+import { addProductToWishlist, getWishlist, isProductInWishlistArray, removeProductFromWishlist } from '../../wishlistService';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
 export default function Product({ product, index }) {
     const { userToken } = useContext(AuthContext);
+    const queryClient = useQueryClient();
 
-    // State to track if the product is in the wishlist
-    const [isInWishlist, setIsInWishlist] = useState(false);
+    /**
+     * PERFORMANCE OPTIMIZATION:
+     * Using React Query for the wishlist deduplicates the API request across all Product instances.
+     * Instead of N requests (one per product) to fetch the wishlist on page load, only 1 request is made.
+     */
+    const { data: wishlistData } = useQuery({
+        queryKey: ['wishlist', userToken],
+        queryFn: () => getWishlist(userToken),
+        enabled: !!userToken,
+        staleTime: 600000, // Cache for 10 minutes to avoid redundant fetches
+    });
 
-    // Effect to check if the product is already in the wishlist
-    useEffect(() => {
-        const checkWishlist = async () => {
-            if (userToken) {
-                const result = await isProductInWishlist(product._id, userToken);
-                setIsInWishlist(result);
+    const wishlist = wishlistData?.data || [];
+    const isInWishlist = isProductInWishlistArray(wishlist, product._id);
+
+    // useMutation handles the API call and provides invalidation to keep the UI in sync
+    const wishlistMutation = useMutation({
+        mutationFn: async () => {
+            if (isInWishlist) {
+                return await removeProductFromWishlist(product._id, userToken);
+            } else {
+                return await addProductToWishlist(product._id, userToken);
             }
-        };
-        checkWishlist();
-    }, [product._id, userToken]);
+        },
+        onSuccess: () => {
+            // Invalidate the wishlist query to refetch the updated data
+            queryClient.invalidateQueries({ queryKey: ['wishlist', userToken] });
+        }
+    });
 
     // Handle wishlist click
-    const handleWishlistClick = async () => {
-        await addProductToWishlist(product._id, userToken);
-        setIsInWishlist(true); // Update the state after adding to the wishlist
+    const handleWishlistClick = () => {
+        wishlistMutation.mutate();
     };
 
     return (
@@ -33,7 +51,7 @@ export default function Product({ product, index }) {
             <div key={index} className="max-w-2xl mx-auto">
                 <div className="bg-white shadow-md rounded-lg max-w-sm dark:bg-gray-800 dark:border-gray-700 hover:shadow-2xl transition-all duration-500">
                     <Link to={"/productDetails/" + product._id}>
-                        <img className="rounded-t-lg p-8" src={product.imageCover} alt={product.title} />
+                        <img className="rounded-t-lg p-8" src={product.imageCover} alt={product.title} loading="lazy" />
                     </Link>
                     <div className="px-5 pb-5">
                         <Link to={"/productDetails/" + product._id}>
