@@ -1,31 +1,49 @@
-import React, { useContext, useState, useEffect } from 'react';
+import { useContext } from 'react';
 import RatingStars from '../RatingStars/RatingStars';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../Contexts/AuthContext';
 import { addProductToCart } from '../../cartService';
-import { addProductToWishlist, isProductInWishlist } from '../../wishlistService';
+import { addProductToWishlist, getWishlist, isProductInWishlistArray, removeProductFromWishlist } from '../../wishlistService';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
+/* eslint-disable react/prop-types */
 export default function Product({ product, index }) {
     const { userToken } = useContext(AuthContext);
+    const queryClient = useQueryClient();
 
-    // State to track if the product is in the wishlist
-    const [isInWishlist, setIsInWishlist] = useState(false);
+    // Fetch wishlist data using React Query - deduplicated across all instances
+    const { data: wishlistData } = useQuery({
+        queryKey: ['wishlist', userToken],
+        queryFn: () => getWishlist(userToken),
+        enabled: !!userToken,
+        // Bolt: Keep wishlist data fresh for 10 minutes to avoid redundant fetches
+        staleTime: 600000,
+    });
 
-    // Effect to check if the product is already in the wishlist
-    useEffect(() => {
-        const checkWishlist = async () => {
-            if (userToken) {
-                const result = await isProductInWishlist(product._id, userToken);
-                setIsInWishlist(result);
-            }
-        };
-        checkWishlist();
-    }, [product._id, userToken]);
+    const isInWishlist = isProductInWishlistArray(wishlistData?.data, product._id);
 
-    // Handle wishlist click
-    const handleWishlistClick = async () => {
-        await addProductToWishlist(product._id, userToken);
-        setIsInWishlist(true); // Update the state after adding to the wishlist
+    // Bolt: Use mutation to add product to wishlist and invalidate query for cache consistency
+    const addToWishlistMutation = useMutation({
+        mutationFn: () => addProductToWishlist(product._id, userToken),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['wishlist', userToken] });
+        }
+    });
+
+    // Bolt: Use mutation to remove product from wishlist and invalidate query for cache consistency
+    const removeFromWishlistMutation = useMutation({
+        mutationFn: () => removeProductFromWishlist(product._id, userToken),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['wishlist', userToken] });
+        }
+    });
+
+    const handleWishlistToggle = () => {
+        if (isInWishlist) {
+            removeFromWishlistMutation.mutate();
+        } else {
+            addToWishlistMutation.mutate();
+        }
     };
 
     return (
@@ -33,7 +51,7 @@ export default function Product({ product, index }) {
             <div key={index} className="max-w-2xl mx-auto">
                 <div className="bg-white shadow-md rounded-lg max-w-sm dark:bg-gray-800 dark:border-gray-700 hover:shadow-2xl transition-all duration-500">
                     <Link to={"/productDetails/" + product._id}>
-                        <img className="rounded-t-lg p-8" src={product.imageCover} alt={product.title} />
+                        <img className="rounded-t-lg p-8" src={product.imageCover} alt={product.title} loading="lazy" />
                     </Link>
                     <div className="px-5 pb-5">
                         <Link to={"/productDetails/" + product._id}>
@@ -49,7 +67,7 @@ export default function Product({ product, index }) {
                             >
                                 Add to cart
                             </button>
-                            <button onClick={handleWishlistClick}>
+                            <button onClick={handleWishlistToggle} disabled={addToWishlistMutation.isPending || removeFromWishlistMutation.isPending}>
                                 <i className={`fa-solid fa-heart text-2xl ${isInWishlist ? 'text-red-500' : 'text-black'}`}></i>
                             </button>
                         </div>
