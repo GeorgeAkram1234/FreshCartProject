@@ -1,39 +1,37 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useState, lazy, Suspense } from 'react'
 import './App.css'
-import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
+import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Layout from './Components/Layout/Layout.jsx'
-import Home from './Components/Home/Home.jsx'
-import Cart from './Components/Cart/Cart.jsx'
-import Product from './Components/Product/Product.jsx'
-import Categories from './Components/Categories/Categories.jsx'
-import Brands from './Components/Brands/Brands.jsx'
-import Login from './Components/Login/Login.jsx'
-import Register from './Components/Register/Register.jsx'
-import Notfound from './Components/Notfound/Notfound.jsx'
 import CounterContextProvider from './Contexts/CounterContext.jsx'
 import AuthContextProvider from './Contexts/AuthContext.jsx'
 import { ThemeProvider } from './Contexts/ThemeContext.jsx'
 import ProtectedRoute from './Components/ProtectedRoute/ProtectedRoute.jsx'
 import ProtectAuthRoutes from './Components/ProtectAuthRoutes/ProtectAuthRoutes.jsx'
-import ProductDetails from './Components/ProductDetails/ProductDetails.jsx'
-import Products from './Components/Products/Products.jsx'
 import { ToastContainer } from 'react-toastify'
-import ShippingAddress from './Components/ShippingAddress/ShippingAddress.jsx'
-import Orders from './Components/AllOrders/Orders.jsx'
 import { Offline } from 'react-detect-offline'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import Wishlist from './Components/Wishlist/Wishlist.jsx'
-import ForgetPass from './Components/ForgetPass/ForgetPass.jsx'
-import VerifyCode from './Components/VerifyCode/VerifyCode.jsx'
+import LoadingScreen from './Components/LoadingScreen/LoadingScreen.jsx'
 
+// Route-based code splitting
+const Home = lazy(() => import('./Components/Home/Home.jsx'))
+const Cart = lazy(() => import('./Components/Cart/Cart.jsx'))
+const Wishlist = lazy(() => import('./Components/Wishlist/Wishlist.jsx'))
+const Products = lazy(() => import('./Components/Products/Products.jsx'))
+const Categories = lazy(() => import('./Components/Categories/Categories.jsx'))
+const Brands = lazy(() => import('./Components/Brands/Brands.jsx'))
+const ForgetPass = lazy(() => import('./Components/ForgetPass/ForgetPass.jsx'))
+const VerifyCode = lazy(() => import('./Components/VerifyCode/VerifyCode.jsx'))
+const ShippingAddress = lazy(() => import('./Components/ShippingAddress/ShippingAddress.jsx'))
+const Orders = lazy(() => import('./Components/AllOrders/Orders.jsx'))
+const ProductDetails = lazy(() => import('./Components/ProductDetails/ProductDetails.jsx'))
+const Login = lazy(() => import('./Components/Login/Login.jsx'))
+const Register = lazy(() => import('./Components/Register/Register.jsx'))
+const Notfound = lazy(() => import('./Components/Notfound/Notfound.jsx'))
 
 let routers = createBrowserRouter([
   {
     path: '', element: <Layout />, children: [
-      // {path:'' , element:<Navigate to={'home'}/>},
       { index: true, element: <ProtectedRoute><Home/></ProtectedRoute> },
       { path: 'cart', element: <ProtectedRoute><Cart /></ProtectedRoute> },
       { path: 'wishlist', element: <ProtectedRoute><Wishlist /></ProtectedRoute> },
@@ -50,16 +48,18 @@ let routers = createBrowserRouter([
       { path: '*', element: <Notfound /> },
     ]
   },
-  // {path:'*' , element:<Notfound/>}
-
-
 ])
 
 function App() {
-
-  const queryClient = new QueryClient()
-
-
+  // Use useState with an initializer function for lazy initialization of QueryClient.
+  // This ensures that the client is only created once and the cache is preserved across re-renders.
+  const [queryClient] = useState(() => new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 600000, // 10 minutes - cache results longer to improve cross-page navigation speed
+      },
+    },
+  }))
 
   return (
     <>
@@ -67,7 +67,9 @@ function App() {
     <ThemeProvider>
         <AuthContextProvider>
             <CounterContextProvider>
-              <RouterProvider router={routers}></RouterProvider>
+              <Suspense fallback={<LoadingScreen />}>
+                <RouterProvider router={routers}></RouterProvider>
+              </Suspense>
               <ToastContainer/>
               <Offline>
                 <div className='fixed bottom-4 start-4 rounded-md bg-yellow-200 p-4'>
@@ -77,8 +79,7 @@ function App() {
             </CounterContextProvider>
           </AuthContextProvider>
         </ThemeProvider>
-      <ReactQueryDevtools 
-      />
+      <ReactQueryDevtools />
     </QueryClientProvider>
     </>
   )
