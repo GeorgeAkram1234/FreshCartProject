@@ -1,112 +1,32 @@
-import React, { useContext, useEffect, useState } from 'react';
-import axios from 'axios';
-import { toast, Bounce } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css'; // Ensure you have this import for toastify styles
+import { useContext } from 'react';
 import { addProductToCart } from '../../cartService';
 import { Link } from 'react-router-dom';
-import ProductDetails from '../ProductDetails/ProductDetails';
 import LoadingScreen from '../LoadingScreen/LoadingScreen'
 import { AuthContext } from '../../Contexts/AuthContext';
 import { Helmet } from 'react-helmet';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getWishlist, removeProductFromWishlist } from '../../wishlistService';
 
 export default function WishList() {
+  const { userToken } = useContext(AuthContext)
+  const queryClient = useQueryClient();
 
+  // Use React Query to manage wishlist state
+  const { data: wishlistData, isLoading } = useQuery({
+    queryKey: ['wishlist', userToken],
+    queryFn: () => getWishlist(userToken),
+    enabled: !!userToken,
+  });
 
-  let { userToken } = useContext(AuthContext)
+  const wishlist = wishlistData?.data || [];
 
-
-  const [wishlist, setWishlist] = useState([]);
-
-  const [isLoading, setIsLoading] = useState(true)
-
-
-  useEffect(() => {
-    getUserWishlist();
-  }, []);
-
-
-  async function getUserWishlist() {
-    try {
-      const { data } = await axios.get("https://ecommerce.routemisr.com/api/v1/wishlist", {
-        headers: {
-          token: userToken
-        },
-      });
-
-      // Check if data and data.wishlist exist and is an array
-      if (data && Array.isArray(data.data)) {
-        setWishlist(data.data);
-      } else {
-        // console.error("Unexpected data format:", data);
-        toast.error("Unexpected data format received", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: true,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-          transition: Bounce,
-        });
-        setWishlist([]); // Set empty array on unexpected data format
-      }
-    } catch (error) {
-      // console.error("Error fetching wishlist:", error);
-      toast.error("Failed to fetch wishlist", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-        transition: Bounce,
-      });
-    } finally {
-
+  // useMutation for removal with cache invalidation
+  const removeMutation = useMutation({
+    mutationFn: (productId) => removeProductFromWishlist(productId, userToken),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['wishlist', userToken] });
     }
-    setIsLoading(false)
-  }
-
-  async function productRemove(productId) {
-    try {
-      await axios.delete(`https://ecommerce.routemisr.com/api/v1/wishlist/${productId}`, {
-        headers: {
-          token: localStorage.getItem("token"),
-        },
-      });
-      // After removing a product, refetch the wishlist
-      getUserWishlist();
-      toast.success("Product removed from wishlist successfully", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-        transition: Bounce,
-      });
-    } catch (error) {
-      toast.error("Failed to remove product from wishlist", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: true,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-        transition: Bounce,
-      });
-    }
-
-  }
-
-
+  });
 
   return (
     <>
@@ -126,12 +46,13 @@ export default function WishList() {
               <div key={product.id} className="flex flex-col shadow-xl p-3">
                 <div className="relative">
                   <Link to={"/productDetails/" + product._id}>
-                    <img className=" rounded-lg lg:block" src={product.imageCover} alt={product.name} />
+                    <img className=" rounded-lg lg:block" src={product.imageCover} alt={product.title} loading="lazy" />
                   </Link>
                   <button
                     aria-label="remove"
-                    className="top-4 right-4 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-600 absolute p-1.5 hover:text-gray-400"
-                    onClick={() => productRemove(product.id)}
+                    className="top-4 right-4 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-600 absolute p-1.5 hover:text-gray-400 disabled:opacity-50"
+                    disabled={removeMutation.isPending}
+                    onClick={() => removeMutation.mutate(product._id)}
                   >
                     <svg className="fill-current" width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                       <path d="M13 1L1 13" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
@@ -141,19 +62,19 @@ export default function WishList() {
                 </div>
                 <div className="mt-1 flex justify-between items-center ">
                   <div className="flex justify-center items-center">
-                    <p className="tracking-tight text-2xl font-semibold leading-6 text-gray-600 dark:text-white">{product.name}</p>
+                    <p className="tracking-tight text-2xl font-semibold leading-6 text-gray-600 dark:text-white line-clamp-1">{product.title}</p>
                   </div>
 
                 </div>
                 <div className="flex flex-col justify-start items-start mt-0">
-                  <div>
+                  {product.code && <div>
                     <p className=" tracking-tight text-xs leading-3 text-gray-600 dark:text-white">{product.code}</p>
-                  </div>
-                  <div className="mt-1">
+                  </div>}
+                  {product.color && <div className="mt-1">
                     <p className="tracking-tight text-base font-medium leading-4 text-gray-600 dark:text-white">{product.color}</p>
-                  </div>
+                  </div>}
                   <div className="mt-1">
-                    <p className="tracking-tight text-base font-medium leading-4 text-gray-600 dark:text-white">{product.name}</p>
+                    <p className="tracking-tight text-base font-medium leading-4 text-gray-600 dark:text-white line-clamp-1">{product.title}</p>
                   </div>
                   <div className="mt-1">
                     <p className="  flex justify-start  tracking-tight font-bold  text-lg leading-4 text-gray-600 dark:text-white"> Price : ${product.price}</p>
