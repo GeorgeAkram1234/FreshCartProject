@@ -1,0 +1,3 @@
+## 2025-05-14 - Optimized Wishlist Fetching (N+1 to 1)
+**Learning:** The application was making an individual wishlist API request for every single 'Product' component rendered on the page to determine its 'isInWishlist' status. This created a significant performance bottleneck (N+1 network requests) and triggered rate limiting/latency on large product lists.
+**Action:** Centralize the wishlist state using React Query with a shared query key. This leverages request deduplication to ensure only one GET request is made for the entire list of products, and provides an efficient cache that remains consistent across route transitions (Home -> Wishlist).
