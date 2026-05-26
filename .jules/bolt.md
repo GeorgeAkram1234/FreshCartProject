@@ -1,0 +1,3 @@
+## 2025-01-24 - [Route-based Code Splitting]
+**Learning:** Implementing route-based code splitting using `React.lazy` and `Suspense` significantly reduces the main bundle size. In this project, the main chunk size was reduced from ~379kB to ~273kB (~28% reduction) by correctly lazy loading all route components and ensuring that `ProtectedRoute` uses `<Navigate />` instead of direct component rendering to avoid static import coupling.
+**Action:** Always use `React.lazy` for route components and ensure `ProtectedRoute` or similar components do not statically import components that are intended to be lazy-loaded.
