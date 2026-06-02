@@ -1,0 +1,3 @@
+## 2026-06-02 - Route-based code splitting
+**Learning:** Implementing route-based code splitting using `React.lazy()` and `Suspense` significantly reduces the initial bundle size (from 498.69 kB to 273.05 kB in this case). However, static imports in intermediate components like `ProtectedRoute` can block the effective splitting of the imported modules (e.g., `Login`). Using `react-router-dom`'s `<Navigate />` instead of directly rendering the component in `ProtectedRoute` allows the component to be correctly moved into its own chunk.
+**Action:** Always check for static imports of lazy-loaded components in guard or wrapper components and replace them with redirects or dynamic imports.
