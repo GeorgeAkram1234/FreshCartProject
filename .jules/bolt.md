@@ -1,0 +1,3 @@
+## 2025-01-24 - Route-based Code Splitting
+**Learning:** Implementing `React.lazy()` and `Suspense` for all main routes significantly reduces the initial production bundle size. In this application, the main JS bundle (index-*.js) was reduced from 498.69 kB to 273.03 kB. Static imports in structural components like `ProtectedRoute` can prevent effective code-splitting; replacing direct component rendering with redirects (e.g., `<Navigate to="/login" />`) allows the lazy-loaded components to be correctly moved into separate chunks.
+**Action:** Always prefer route-based code splitting for large applications and ensure that components intended for lazy loading are not statically imported elsewhere in the common execution path.
