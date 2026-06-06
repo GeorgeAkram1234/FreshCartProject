@@ -1,6 +1,5 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import logo from '../../assets/images/freshcart-logo.svg';
-import style from './Home.module.css'
 import axios from 'axios'
 import Product from '../Product/Product'
 import LoadingScreen from '../LoadingScreen/LoadingScreen'
@@ -68,8 +67,8 @@ export default function Home() {
         <LoadingScreen />
       ) : (
         <div className='container mx-auto grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-3'>
-          {filteredProducts.map((product, index) => (
-            <Product key={product.id || index} product={product} />
+          {filteredProducts.map((product) => (
+            <Product key={product.id || product._id} product={product} />
           ))}
         </div>
       )}

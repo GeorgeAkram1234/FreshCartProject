@@ -1,6 +1,5 @@
-import { useQuery } from '@tanstack/react-query'
 import axios from 'axios'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Helmet } from 'react-helmet'
 import Product from '../Product/Product'
 import LoadingScreen from '../LoadingScreen/LoadingScreen'
@@ -57,8 +56,8 @@ export default function Products() {
                 {
                     loading ? <LoadingScreen /> : 
                     <div className='grid md:grid-cols-2 lg:grid-cols-4 gap-3'>
-                        {filteredProducts.map((product, index) => {
-                            return <Product product={product} key={product.id || index} />
+                        {filteredProducts.map((product) => {
+                            return <Product product={product} key={product.id || product._id} />
                         })}
                     </div>
                 }
