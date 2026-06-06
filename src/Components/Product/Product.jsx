@@ -1,36 +1,45 @@
-import React, { useContext, useState, useEffect } from 'react';
+import { useContext } from 'react';
 import RatingStars from '../RatingStars/RatingStars';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../Contexts/AuthContext';
 import { addProductToCart } from '../../cartService';
-import { addProductToWishlist, isProductInWishlist } from '../../wishlistService';
+import { addProductToWishlist, removeProductFromWishlist, getWishlist, isProductInWishlistArray } from '../../wishlistService';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
-export default function Product({ product, index }) {
+export default function Product({ product }) {
     const { userToken } = useContext(AuthContext);
+    const queryClient = useQueryClient();
 
-    // State to track if the product is in the wishlist
-    const [isInWishlist, setIsInWishlist] = useState(false);
+    // Use React Query to fetch and cache the wishlist, deduplicating requests across all Product components
+    const { data: wishlist } = useQuery({
+        queryKey: ['wishlist', userToken],
+        queryFn: () => getWishlist(userToken),
+        enabled: !!userToken,
+        staleTime: 600000, // Consider data fresh for 10 minutes to maximize caching
+    });
 
-    // Effect to check if the product is already in the wishlist
-    useEffect(() => {
-        const checkWishlist = async () => {
-            if (userToken) {
-                const result = await isProductInWishlist(product._id, userToken);
-                setIsInWishlist(result);
-            }
-        };
-        checkWishlist();
-    }, [product._id, userToken]);
+    const isInWishlist = isProductInWishlistArray(wishlist, product._id);
 
-    // Handle wishlist click
+    // Handle wishlist toggle
     const handleWishlistClick = async () => {
-        await addProductToWishlist(product._id, userToken);
-        setIsInWishlist(true); // Update the state after adding to the wishlist
+        if (!userToken) return;
+
+        try {
+            if (isInWishlist) {
+                await removeProductFromWishlist(product._id, userToken);
+            } else {
+                await addProductToWishlist(product._id, userToken);
+            }
+            // Invalidate the wishlist query to refetch and update all Product icons
+            queryClient.invalidateQueries({ queryKey: ['wishlist', userToken] });
+        } catch (error) {
+            console.error("Error toggling wishlist:", error);
+        }
     };
 
     return (
         <>
-            <div key={index} className="max-w-2xl mx-auto">
+            <div className="max-w-2xl mx-auto">
                 <div className="bg-white shadow-md rounded-lg max-w-sm dark:bg-gray-800 dark:border-gray-700 hover:shadow-2xl transition-all duration-500">
                     <Link to={"/productDetails/" + product._id}>
                         <img className="rounded-t-lg p-8" src={product.imageCover} alt={product.title} />
@@ -40,7 +49,7 @@ export default function Product({ product, index }) {
                             <h3 className="text-gray-900 font-semibold text-xl tracking-tight dark:text-white line-clamp-1">{product.title}</h3>
                         </Link>
                         <p className="line-clamp-2">{product.description}</p>
-                        <RatingStars rating={product.ratingsAverage} key={index} />
+                        <RatingStars rating={product.ratingsAverage} />
                         <div className="flex items-center justify-between">
                             <span className="text-3xl font-bold text-gray-900 dark:text-white">${product.price}</span>
                             <button
