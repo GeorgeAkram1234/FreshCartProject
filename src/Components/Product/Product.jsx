@@ -1,31 +1,31 @@
-import React, { useContext, useState, useEffect } from 'react';
+import { useContext } from 'react';
 import RatingStars from '../RatingStars/RatingStars';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../Contexts/AuthContext';
 import { addProductToCart } from '../../cartService';
-import { addProductToWishlist, isProductInWishlist } from '../../wishlistService';
+import { addProductToWishlist, getWishlist } from '../../wishlistService';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 export default function Product({ product, index }) {
     const { userToken } = useContext(AuthContext);
+    const queryClient = useQueryClient();
 
-    // State to track if the product is in the wishlist
-    const [isInWishlist, setIsInWishlist] = useState(false);
+    // Use React Query to fetch and cache the wishlist
+    // All Product components will share this same query based on the ['wishlist', userToken] key
+    const { data: wishlistData } = useQuery({
+        queryKey: ['wishlist', userToken],
+        queryFn: () => getWishlist(userToken),
+        enabled: !!userToken,
+        staleTime: 600000, // 10 minutes - adjust as needed
+    });
 
-    // Effect to check if the product is already in the wishlist
-    useEffect(() => {
-        const checkWishlist = async () => {
-            if (userToken) {
-                const result = await isProductInWishlist(product._id, userToken);
-                setIsInWishlist(result);
-            }
-        };
-        checkWishlist();
-    }, [product._id, userToken]);
+    const wishlist = wishlistData?.data || wishlistData?.wishlist || [];
+    const isInWishlist = wishlist.some(item => item._id === product._id || item.id === product._id);
 
     // Handle wishlist click
     const handleWishlistClick = async () => {
         await addProductToWishlist(product._id, userToken);
-        setIsInWishlist(true); // Update the state after adding to the wishlist
+        queryClient.invalidateQueries({ queryKey: ['wishlist', userToken] });
     };
 
     return (
