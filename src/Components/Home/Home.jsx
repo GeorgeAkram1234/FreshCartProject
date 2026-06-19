@@ -68,8 +68,8 @@ export default function Home() {
         <LoadingScreen />
       ) : (
         <div className='container mx-auto grid lg:grid-cols-4 md:grid-cols-2 grid-cols-1 gap-3'>
-          {filteredProducts.map((product, index) => (
-            <Product key={product.id || index} product={product} />
+          {filteredProducts.map((product) => (
+            <Product key={product._id} product={product} />
           ))}
         </div>
       )}
