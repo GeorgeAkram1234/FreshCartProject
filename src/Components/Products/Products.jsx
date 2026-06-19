@@ -57,8 +57,8 @@ export default function Products() {
                 {
                     loading ? <LoadingScreen /> : 
                     <div className='grid md:grid-cols-2 lg:grid-cols-4 gap-3'>
-                        {filteredProducts.map((product, index) => {
-                            return <Product product={product} key={product.id || index} />
+                        {filteredProducts.map((product) => {
+                            return <Product product={product} key={product._id} />
                         })}
                     </div>
                 }
