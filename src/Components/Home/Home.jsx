@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import logo from '../../assets/images/freshcart-logo.svg';
 import style from './Home.module.css'
 import axios from 'axios'
