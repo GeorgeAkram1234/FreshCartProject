@@ -30,6 +30,14 @@ import ForgetPass from './Components/ForgetPass/ForgetPass.jsx'
 import VerifyCode from './Components/VerifyCode/VerifyCode.jsx'
 
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 10 * 60 * 1000, // 10 minutes
+    },
+  },
+})
+
 let routers = createBrowserRouter([
   {
     path: '', element: <Layout />, children: [
@@ -56,8 +64,6 @@ let routers = createBrowserRouter([
 ])
 
 function App() {
-
-  const queryClient = new QueryClient()
 
 
 
