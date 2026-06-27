@@ -1,0 +1,3 @@
+## 2024-06-27 - Centralizing Wishlist State to Resolve N+1 Request Problem
+**Learning:** In a component-heavy application (like a product grid), performing independent API calls for each item's state (e.g., "is favorited") leads to massive network overhead. Centralizing this state using a caching library like React Query allows for automatic request deduplication and sharing of data across all components.
+**Action:** Always check if a component's internal `useEffect` for fetching data can be replaced with a shared query hook, especially when multiple instances of the same component appear on a single page.
