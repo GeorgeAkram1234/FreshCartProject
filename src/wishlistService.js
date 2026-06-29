@@ -32,20 +32,29 @@ export async function addProductToWishlist(productId, userToken) {
     }
 }
 
-// Function to check if a product is in the wishlist
-export async function isProductInWishlist(productId, userToken) {
+// Function to get the user's wishlist
+export async function getWishlist(userToken) {
+    if (!userToken) return [];
     try {
         let { data } = await axios.get(`https://ecommerce.routemisr.com/api/v1/wishlist`, {
             headers: {
                 token: userToken,
             },
         });
+        return data.data || [];
+    } catch (error) {
+        console.error("Error fetching wishlist:", error);
+        return [];
+    }
+}
 
-        // Assuming data.wishlist contains an array of wishlist products
-        const wishlist = data.wishlist || [];
+// Function to check if a product is in the wishlist
+export async function isProductInWishlist(productId, userToken) {
+    try {
+        const wishlist = await getWishlist(userToken);
 
         // Check if the productId exists in the wishlist
-        const productInWishlist = wishlist.some(item => item._id === productId);
+        const productInWishlist = wishlist.some(item => item._id === productId || item.id === productId);
 
         return productInWishlist;
 
