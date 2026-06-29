@@ -55,10 +55,15 @@ let routers = createBrowserRouter([
 
 ])
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 600000,
+    },
+  },
+})
+
 function App() {
-
-  const queryClient = new QueryClient()
-
 
 
   return (
