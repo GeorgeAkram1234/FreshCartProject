@@ -25,6 +25,8 @@ export async function addProductToWishlist(productId, userToken) {
             theme: "light",
             transition: Bounce,
         });
+
+        return data;
         
     } catch (error) {
         console.error("Error adding product to wishlist:", error);
@@ -32,25 +34,29 @@ export async function addProductToWishlist(productId, userToken) {
     }
 }
 
-// Function to check if a product is in the wishlist
-export async function isProductInWishlist(productId, userToken) {
+// Function to get the user's wishlist
+export async function getWishlist(userToken) {
     try {
-        let { data } = await axios.get(`https://ecommerce.routemisr.com/api/v1/wishlist`, {
+        const { data } = await axios.get(`https://ecommerce.routemisr.com/api/v1/wishlist`, {
             headers: {
                 token: userToken,
             },
         });
+        return data.data; // The API returns the wishlist in data.data
+    } catch (error) {
+        console.error("Error fetching wishlist:", error);
+        return [];
+    }
+}
 
-        // Assuming data.wishlist contains an array of wishlist products
-        const wishlist = data.wishlist || [];
-
-        // Check if the productId exists in the wishlist
-        const productInWishlist = wishlist.some(item => item._id === productId);
-
+// Function to check if a product is in the wishlist
+export async function isProductInWishlist(productId, userToken) {
+    try {
+        const wishlist = await getWishlist(userToken);
+        const productInWishlist = wishlist.some(item => (item._id || item.id) === productId);
         return productInWishlist;
-
     } catch (error) {
         console.error("Error checking wishlist:", error);
-        return false; // Return false in case of an error
+        return false;
     }
 }
