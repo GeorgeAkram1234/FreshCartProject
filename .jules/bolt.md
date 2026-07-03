@@ -1,0 +1,3 @@
+## 2026-07-03 - [N+1 Wishlist Fetch Bottleneck]
+**Learning:** In e-commerce listing pages (Home/Products), each product component independently checking its wishlist status via individual API calls (N+1 problem) caused excessive network overhead and potential rate-limiting. React Query's query deduplication and cache sharing across component instances effectively collapses these N calls into a single request.
+**Action:** Always check if repeated component-level fetches can be centralized or handled by a shared React Query key with a reasonable `staleTime`. Use stable keys (e.g., `_id`) for mapped items to further optimize reconciliation.
