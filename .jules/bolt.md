@@ -1,0 +1,3 @@
+## 2024-11-20 - [Frontend N+1 Fetch Bottleneck]
+**Learning:** In React applications with large product grids, child components often independently fetch global state (like a wishlist) to determine their internal UI state. Without a shared caching layer, this results in an N+1 network waterfall (e.g., 80+ redundant GET requests for 80 products) that hammers the API and slows down the Main Thread.
+**Action:** Use React Query with a shared query key and a strategic `staleTime` (e.g., 10 mins) to deduplicate these requests. Ensure that mutations (add/remove) invalidating the shared key are handled correctly to maintain UI consistency without losing the performance benefit.

@@ -26,23 +26,31 @@ export async function addProductToWishlist(productId, userToken) {
             transition: Bounce,
         });
         
+        return data; // Return data for React Query mutations
     } catch (error) {
         console.error("Error adding product to wishlist:", error);
         toast.error("Failed to add product to wishlist. Please try again.");
+        throw error;
     }
+}
+
+// Function to get the entire wishlist
+export async function getWishlist(userToken) {
+    const { data } = await axios.get(`https://ecommerce.routemisr.com/api/v1/wishlist`, {
+        headers: {
+            token: userToken,
+        },
+    });
+    return data;
 }
 
 // Function to check if a product is in the wishlist
 export async function isProductInWishlist(productId, userToken) {
     try {
-        let { data } = await axios.get(`https://ecommerce.routemisr.com/api/v1/wishlist`, {
-            headers: {
-                token: userToken,
-            },
-        });
+        const data = await getWishlist(userToken);
 
-        // Assuming data.wishlist contains an array of wishlist products
-        const wishlist = data.wishlist || [];
+        // Assuming data.data contains an array of wishlist products
+        const wishlist = data.data || [];
 
         // Check if the productId exists in the wishlist
         const productInWishlist = wishlist.some(item => item._id === productId);
